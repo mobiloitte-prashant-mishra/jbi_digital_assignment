@@ -1,0 +1,119 @@
+<?php
+$view = new view();
+$view->name = 'event_list';
+$view->description = 'Get all custom event list';
+$view->tag = 'default';
+$view->base_table = 'node';
+$view->human_name = 'Event List';
+$view->core = 7;
+$view->api_version = '3.0';
+$view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
+
+/* Display: Master */
+$handler = $view->new_display('default', 'Master', 'default');
+$handler->display->display_options['title'] = 'Event List';
+$handler->display->display_options['use_more_always'] = FALSE;
+$handler->display->display_options['access']['type'] = 'perm';
+$handler->display->display_options['cache']['type'] = 'none';
+$handler->display->display_options['query']['type'] = 'views_query';
+$handler->display->display_options['exposed_form']['type'] = 'basic';
+$handler->display->display_options['exposed_form']['options']['submit_button'] = 'Search';
+$handler->display->display_options['pager']['type'] = 'full';
+$handler->display->display_options['pager']['options']['items_per_page'] = '8';
+$handler->display->display_options['pager']['options']['offset'] = '0';
+$handler->display->display_options['pager']['options']['id'] = '0';
+$handler->display->display_options['pager']['options']['quantity'] = '9';
+$handler->display->display_options['style_plugin'] = 'grid';
+$handler->display->display_options['row_plugin'] = 'fields';
+/* Field: Content: Image */
+$handler->display->display_options['fields']['image']['id'] = 'image';
+$handler->display->display_options['fields']['image']['table'] = 'field_data_image';
+$handler->display->display_options['fields']['image']['field'] = 'image';
+$handler->display->display_options['fields']['image']['label'] = '';
+$handler->display->display_options['fields']['image']['element_label_colon'] = FALSE;
+$handler->display->display_options['fields']['image']['click_sort_column'] = 'fid';
+$handler->display->display_options['fields']['image']['settings'] = array(
+  'image_style' => 'medium',
+  'image_link' => 'content',
+);
+/* Field: Content: Title */
+$handler->display->display_options['fields']['title']['id'] = 'title';
+$handler->display->display_options['fields']['title']['table'] = 'node';
+$handler->display->display_options['fields']['title']['field'] = 'title';
+$handler->display->display_options['fields']['title']['label'] = '';
+$handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
+$handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+/* Field: Content: Event Date */
+$handler->display->display_options['fields']['event_date']['id'] = 'event_date';
+$handler->display->display_options['fields']['event_date']['table'] = 'field_data_event_date';
+$handler->display->display_options['fields']['event_date']['field'] = 'event_date';
+$handler->display->display_options['fields']['event_date']['label'] = '';
+$handler->display->display_options['fields']['event_date']['element_label_colon'] = FALSE;
+$handler->display->display_options['fields']['event_date']['settings'] = array(
+  'format_type' => 'short',
+  'custom_date_format' => '',
+  'fromto' => 'both',
+  'multiple_number' => '',
+  'multiple_from' => '',
+  'multiple_to' => '',
+  'show_remaining_days' => 0,
+);
+/* Field: Content: Location */
+$handler->display->display_options['fields']['location']['id'] = 'location';
+$handler->display->display_options['fields']['location']['table'] = 'field_data_location';
+$handler->display->display_options['fields']['location']['field'] = 'location';
+$handler->display->display_options['fields']['location']['label'] = '';
+$handler->display->display_options['fields']['location']['element_label_colon'] = FALSE;
+/* Sort criterion: Content: Event Date -  start date (event_date) */
+$handler->display->display_options['sorts']['event_date_value']['id'] = 'event_date_value';
+$handler->display->display_options['sorts']['event_date_value']['table'] = 'field_data_event_date';
+$handler->display->display_options['sorts']['event_date_value']['field'] = 'event_date_value';
+/* Filter criterion: Content: Published */
+$handler->display->display_options['filters']['status']['id'] = 'status';
+$handler->display->display_options['filters']['status']['table'] = 'node';
+$handler->display->display_options['filters']['status']['field'] = 'status';
+$handler->display->display_options['filters']['status']['value'] = 1;
+$handler->display->display_options['filters']['status']['group'] = 1;
+$handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+/* Filter criterion: Content: Type */
+$handler->display->display_options['filters']['type']['id'] = 'type';
+$handler->display->display_options['filters']['type']['table'] = 'node';
+$handler->display->display_options['filters']['type']['field'] = 'type';
+$handler->display->display_options['filters']['type']['value'] = array(
+  'custom_events' => 'custom_events',
+);
+/* Filter criterion: Content: Event Category (event_category) */
+$handler->display->display_options['filters']['event_category_tid']['id'] = 'event_category_tid';
+$handler->display->display_options['filters']['event_category_tid']['table'] = 'field_data_event_category';
+$handler->display->display_options['filters']['event_category_tid']['field'] = 'event_category_tid';
+$handler->display->display_options['filters']['event_category_tid']['exposed'] = TRUE;
+$handler->display->display_options['filters']['event_category_tid']['expose']['operator_id'] = 'event_category_tid_op';
+$handler->display->display_options['filters']['event_category_tid']['expose']['label'] = 'Type';
+$handler->display->display_options['filters']['event_category_tid']['expose']['operator'] = 'event_category_tid_op';
+$handler->display->display_options['filters']['event_category_tid']['expose']['identifier'] = 'event_category_tid';
+$handler->display->display_options['filters']['event_category_tid']['expose']['remember_roles'] = array(
+  2 => '2',
+  1 => 0,
+  3 => 0,
+);
+$handler->display->display_options['filters']['event_category_tid']['type'] = 'select';
+$handler->display->display_options['filters']['event_category_tid']['vocabulary'] = 'event_category';
+/* Filter criterion: Content: Event Date -  start date (event_date) */
+$handler->display->display_options['filters']['event_date_value']['id'] = 'event_date_value';
+$handler->display->display_options['filters']['event_date_value']['table'] = 'field_data_event_date';
+$handler->display->display_options['filters']['event_date_value']['field'] = 'event_date_value';
+$handler->display->display_options['filters']['event_date_value']['operator'] = 'between';
+$handler->display->display_options['filters']['event_date_value']['exposed'] = TRUE;
+$handler->display->display_options['filters']['event_date_value']['expose']['operator_id'] = 'event_date_value_op';
+$handler->display->display_options['filters']['event_date_value']['expose']['operator'] = 'event_date_value_op';
+$handler->display->display_options['filters']['event_date_value']['expose']['identifier'] = 'event_date_value';
+$handler->display->display_options['filters']['event_date_value']['expose']['remember_roles'] = array(
+  2 => '2',
+  1 => 0,
+  3 => 0,
+);
+$handler->display->display_options['filters']['event_date_value']['form_type'] = 'date_popup';
+
+/* Display: Page */
+$handler = $view->new_display('page', 'Page', 'page');
+$handler->display->display_options['path'] = 'events';

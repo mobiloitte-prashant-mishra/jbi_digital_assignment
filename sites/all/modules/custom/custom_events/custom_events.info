@@ -1,0 +1,14 @@
+name = Custom Events
+description = Custom Event Module
+package = Custom Module
+core = 7.x
+files[] = custom_events.install
+files[] = custom_events.module
+dependencies[] = custom_events:wysiwyg
+dependencies[] = custom_events:date
+dependencies[] = custom_events:date_popup
+dependencies[] = custom_events:admin_menu
+dependencies[] = custom_events:views
+dependencies[] = custom_events:views_ui
+dependencies[] = custom_events:date_views
+dependencies[] = jquery_update

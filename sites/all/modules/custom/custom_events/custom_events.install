@@ -1,0 +1,287 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function custom_events_install() {
+    // Disable module
+    $modules = array('toolbar', 'overlay');
+    $disabled_module = db_update('system') // Table name no longer needs {}
+        ->fields(array('status' => 0))
+        ->condition('name', $modules, 'IN')
+        ->condition('type', 'module')
+        ->execute();
+    
+    // Disable block
+    $sql = "UPDATE {block} SET status = 0 WHERE ((module = 'search' AND delta = 'form') || (module = 'system' AND delta = 'navigation') || (module = 'user' AND delta = 'login'))";
+
+    $disabled_block = db_query($sql);
+
+    // Enabled Bootstrap(jbi_digital) custom theme
+    $theme = 'jbi_digital';
+    $enable_theme = db_update('system') // Table name no longer needs {}
+        ->fields(array('status' => 1))
+        ->condition('name', $theme)
+        ->condition('type', 'theme')
+        ->execute();
+
+    variable_set('theme_default', $theme);
+    
+    //Disable default bartik theme
+    $theme = 'bartik';
+    $disable_theme = db_update('system') // Table name no longer needs {}
+        ->fields(array('status' => 0))
+        ->condition('name', $theme)
+        ->condition('type', 'theme')
+        ->execute();
+
+    // Create custom event category vocabulary
+    $event_vocab = new stdClass();
+    $event_vocab->name = 'Event catagory vocabulary';
+    $event_vocab->description = 'Event category vocabulary';
+    $event_vocab->machine_name = 'event_category';
+    taxonomy_vocabulary_save($event_vocab);
+
+    // Add term to event category vocabulary
+    $new_term = new stdClass();
+    $new_term->name = 'Mobile Event';
+    $new_term->vid = $event_vocab->vid;
+    $new_term = taxonomy_term_save($new_term); 
+
+    // Rebuild node types and attach body field
+    node_types_rebuild();
+    $types = node_type_get_types();
+    variable_set("comment_custom_events", '1');
+    node_add_body_field($types['custom_events'], 'Description'); 
+    add_custom_fields();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function custom_events_uninstall() {
+    // Disable jbi_digtal theme
+    $theme = 'jbi_digital';
+    $disable_theme = db_update('system')
+        ->fields(array('status' => 0))
+        ->condition('name', $theme)
+        ->condition('type', 'theme')
+        ->execute();
+    
+    //Enable default bartik theme
+    $theme = 'bartik';
+    $enable_theme = db_update('system')
+        ->fields(array('status' => 1))
+        ->condition('name', $theme)
+        ->condition('type', 'theme')
+        ->execute();
+
+    variable_set('theme_default', $theme);
+
+    // Remove event category vocabulary entry from database
+    $vocab = taxonomy_vocabulary_machine_name_load('event_category');
+    taxonomy_vocabulary_delete($vocab->vid);
+
+    // Remove custom events content type entry from database
+    $content_type = 'custom_events';
+
+    $query = db_select('node', 'n')
+    ->condition('n.type', $content_type)  
+    ->fields('n', array('nid'));
+    $result = $query->execute();
+
+    $nodeids = array();
+    foreach ($result as $row) {
+        $nodeids[] = $row->nid;
+    }
+    node_delete_multiple($nodeids);
+    delete_custom_fields();
+    node_type_delete($content_type);
+    field_purge_batch(500);
+}
+
+/**
+ * Create custom fields.
+ */
+function custom_events_type_installed_fields() {
+    $t = get_t();
+    return array(
+        'event_category' => array(
+            'field_name' => 'event_category',
+            'label' => $t('Event Category'),
+            'type' => 'taxonomy_term_reference',
+            'required' => TRUE,
+            'settings' => array(
+                'allowed_values' => array(
+                    array(
+                        'vocabulary' => 'event_category',
+                        'parent' => 0
+                    ),
+                ),
+            ),
+        ),
+        'image' => array(
+            'field_name' => 'image',
+            'label' => $t('Image'),
+            'type' => 'image',
+            'description' => t('Click "Browse..." to select an image to upload.'),
+            'style_name' => 'thumbnail',
+            'settings' => array(
+                'instance_settings' => array(	
+                    'file_extensions' => 'jpg jpeg png gif',
+                    'file_directory' => 'events_image',
+                    'style_name' => 'thumbnail'
+                ),
+                'file_extensions' => 'jpg jpeg png gif',
+                'max_filesize' => '2MB',
+                'style_name' => 'thumbnail'
+            ),
+            
+        ),
+        'location' => array(
+            'field_name' => 'location',
+            'label' => $t('Location'),
+            'type' => 'text',
+        ),
+        'event_date' => array(
+            'field_name' => 'event_date',
+            'cardinality' => 1,
+            'type' => 'datestamp',
+            'settings' => array(
+                'repeat' => 0,
+                'todate' => TRUE,
+                'granularity' => array(
+                    'year' => 'year',
+                    'month' => 'month',
+                    'day' => 'day',
+                    'hour' => 'hour',
+                    'minute' => 'minute',
+                ),
+                'tz_handling' => 'none',
+                'timezone_db' => ''
+            ),
+        )
+    );
+}
+
+/**
+ * Create custom fields instances.
+ */
+function custom_events_type_installed_instances() {
+    $t = get_t();
+    return array(
+        'event_category' => array(
+            'field_name' => 'event_category',
+            'type' => 'taxonomy_term_reference',
+            'label' => $t('Event Category'),
+            'required' => TRUE,
+            'widget' => array(
+                'type' => 'options_select'
+            ),
+            'display' => array(
+                'default' => array(
+                    'label' => $t('Event Category'),
+                    'type' => 'taxonomy_term_reference',
+                    'weight' => 3,
+                )
+            )
+        ),
+        'image' => array(
+            'field_name' => 'image',
+            'type' => 'image',
+            'label' => 'Image',
+            'required' => TRUE,
+            'widget' => array(
+                'type' => 'image'
+            ),
+            'settings' => array(
+                'file_directory' => 'events_image',
+                'file_extensions' => 'jpg jpeg png gif',
+                'max_filesize' => '2MB',
+                'title_field' => '',
+                'style_name' => 'thumbnail'
+            ),
+            'display' => array(
+                'default' => array(
+                    'type' => 'image',
+                    'weight' => 1,
+                    'label' => 'hidden',
+                    'settings' => array(
+                        'style_name' => 'thumbnail'
+                    )
+                    
+                ),
+                'teaser' => array(
+                    'type' => 'image',
+                    'weight' => 1,
+                ),
+            )
+        ),
+        'location' => array(
+            'field_name' => 'location',
+            'type' => 'text',
+            'label' => $t('Location'),
+            'widget' => array(
+                'type' => 'text_textfield'
+            ),
+            'display' => array(
+                'default' => array(
+                    'label' => $t('Location'),
+                    'type' => 'text',
+                    'weight' => 5,
+                )
+            )
+        ),
+        'event_date' => array(
+            'field_name' => 'event_date',
+            'label' => $t('Event Date'),
+            'required' => TRUE,
+            'description' => $t('Enter event date'),
+            'widget' => array(
+                'type' => 'date_popup',
+                'settings' => array(
+                    'input_format' => 'Y-m-d H:i:s',
+                    'year_range' => '-100:+5',
+                    'increment' => 1,
+                ),
+            ),
+            'display' => array(
+                'default' => array(
+                    'type' => 'date_default',
+                    'format_type' => 'short',
+                    'fromto' => 'both',
+                    'weight' => 4,
+                    'settings' => array(
+                        'format_type' => 'short',
+                        'show_repeat_rule' => 'show',
+                        'multiple_number' => '',
+                        'multiple_from' => '',
+                        'multiple_to'  => '',
+                        'fromto' => 'both',
+                    ),
+                ),
+            ),
+        )
+    );
+}
+
+function add_custom_fields() {
+    foreach (custom_events_type_installed_fields() as $field) {
+        field_create_field($field);
+    }
+    foreach (custom_events_type_installed_instances() as $field_instance) {
+        $field_instance['entity_type'] = 'node';
+        $field_instance['bundle'] = 'custom_events';
+        field_create_instance($field_instance);
+    }
+}
+
+function delete_custom_fields() {
+    foreach (array_keys(custom_events_type_installed_fields()) as $field) {
+        field_delete_field($field);
+    }
+    $instances = field_info_instances('node', 'custom_events');
+    foreach ($instances as $instance_name => $field_instance) {
+        field_delete_instance($field_instance);
+    }
+}

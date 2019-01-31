@@ -1,0 +1,28 @@
+/**
+ * Place your custom styles here.
+ */
+
+.custom-user-menu {
+    float: right;
+    width: 10%;
+}
+
+div#edit-event-date-value-min-wrapper {
+    float: left;
+}
+div#edit-event-date-value-max-wrapper {
+    float: left;
+}
+#edit-event-date-value-wrapper label {
+    display: block;
+}
+
+.view-id-event_list .views-field-title span.field-content a {
+    display:block;
+    width:220px;
+    word-wrap:break-word;
+}
+
+.view-id-event_list tr td {
+    width: 10%;
+}
